@@ -40,116 +40,100 @@
 
 
     <div class="mermaid">
-    %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'edgeLabelBackground':'#ffffff', 'tertiaryColor': '#f4f4f4', 'fontFamily': 'Roboto', 'lineColor': '#003366', 'primaryBorderColor': '#003366', 'primaryTextColor': '#003366'}}}%%
-    graph TD
-        %% Estilos similares a Canva
-        classDef inicio fill:#003366,stroke:#003366,stroke-width:2px,color:white,rx:5,ry:5;
-        classDef proceso fill:#ffffff,stroke:#003366,stroke-width:1px,color:#003366,rx:0,ry:0;
-        classDef decision fill:#e6f2ff,stroke:#003366,stroke-width:2px,color:#003366,rx:5,ry:5;
-        classDef data fill:#f9f9f9,stroke:#003366,stroke-width:1px,stroke-dasharray: 5 5,color:#003366;
-
-        INICIO--> Init[Inicializar Sistema]:::proceso
-        Init --> Load[/Cargar CSV: Clientes, Vendedores, Productos/]:::data
-        
-        Load --> Login{LOGIN}:::decision
-        Login --> Creds[/Ingresar Eduardo / 5734/ o Ingresar Nelver / 0911/]:::proceso
-
-        Creds --> Check{¿Es válido?}:::decision
-        
-        Check -- No --> Login
-        Check -- Sí --> Menu{MENÚ PRINCIPAL}:::decision
-
-        %% RAMA VENTAS
-        Menu -- "1. Venta" --> StartVenta[Iniciar Venta]:::proceso
-        StartVenta --> FindCli[/Buscar Cliente/]:::data
-        FindCli --> FoundCli{¿Existe?}:::decision
-        FoundCli -- No --> Menu
-        FoundCli -- Sí --> FindVen[/Buscar Vendedor/]:::data
-        FindVen --> FoundVen{¿Existe?}:::decision
-        FoundVen -- No --> Menu
-        FoundVen -- Sí --> Cart[Crear Carrito]:::proceso
-        
-        Cart --> Loop{AGREGAR ITEMS}:::decision
-        Loop --> FindProd[/Buscar Producto/]:::data
-        FindProd --> FoundPro{¿Existe?}:::decision
-        FoundPro -- No --> FindProd
-        FoundPro -- Si --> FoundCanti[/Ingresar Cantidad/]:::data 
-        FoundCanti -->  Stock{¿Hay Stock?}:::decision
-        Stock -- No --> Loop
-        Stock -- Sí --> Add[Agregar a Cola]:::proceso
-        Add --> More{¿Otro?}:::decision
-        More -- Sí --> Loop
-        More -- No --> DescStock[Descontar Stock]:::proceso
-        DescStock --> GenBol[Generar Boleta]:::proceso
-        GenBol --> SaveBol[/Confirmar la venta/]:::data
-        SaveBol --> FinVenta
 
 
-        Menu -- "2. Crear Cliente" --> StartCliente[Iniciar proceso]:::proceso
-        StartCliente --> FindCl[/Ingresar datos: Nombre completo, DNI, Dirección/]:::data
-        FindCl --> CreaCli[Cliente creado]:::proceso
-        CreaCli --> SaveCli[/Guardado en Datos_Clientes.csv/]:::data
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'edgeLabelBackground':'#ffffff', 'tertiaryColor': '#f4f4f4', 'fontFamily': 'Roboto', 'lineColor': '#003366', 'primaryBorderColor': '#003366', 'primaryTextColor': '#003366'}}}%%
 
-        
-        Menu -- "3. Crear Vendedor" --> StartVendedor[Iniciar proceso]:::proceso
-        StartVendedor --> FindVe[/Ingresar datos: Nombre completo y codigo para ventas/]:::data
-        FindVe --> CreaVend[Vendedor creado]:::proceso
-        CreaVend --> SaveVen[/Guardado en Datos_Vendedores.csv/]:::data
+graph LR
 
+    %% Estilos
+    classDef proceso fill:#ffffff,stroke:#003366,stroke-width:1px,color:#003366;
+    classDef decision fill:#e6f2ff,stroke:#003366,stroke-width:2px,color:#003366;
+    classDef data fill:#f9f9f9,stroke:#003366,stroke-width:1px,stroke-dasharray:5 5,color:#003366;
 
-        Menu -- "4. Crear Producto" --> StartProducto[Iniciar proceso]:::proceso
-        StartProducto --> FindCod[/Generacion de codigo automatica/]
-        FindCod --> FindPr[/Ingresar datos: Nombre del producto, Unidad, Precio de compra y stock inicial/]:::data
-        FindPr --> CreaPro[Producto creado]:::proceso
-        CreaPro --> SavePro[/Guardado en Datos_Productos.csv/]:::data
+    Init[Inicializar Sistema]:::proceso --> Load[/Cargar CSV: Clientes, Vendedores, Productos/]:::data
 
+    Load --> Login{LOGIN}:::decision
+    Login --> Creds[/Ingresar Usuario y Clave/]:::data
+    Creds --> Check{¿Es válido?}:::decision
+    Check -- No --> Login
+    Check -- Sí --> Menu{MENÚ PRINCIPAL}:::decision
 
-        Menu -- "5. Eliminar Cliente" --> StartEliCli[Iniciar proceso]:::proceso
-        StartEliCli --> FindEliCli[/Buscar Nombre o DNI/]:::data
-        FindEliCli --> FoundEliCli{¿Existe?}:::decision
-        FoundEliCli -- No --> Menu
-        FoundEliCli -- Si --> FoundEliCl[/Cliente eliminado/]:::data 
+    %% 1. VENTA
+    Menu -- "1. Venta" --> FindCli[/Buscar Cliente/]:::data
+    FindCli --> FoundCli{¿Existe?}:::decision
+    FoundCli -- No --> Menu
+    FoundCli -- Sí --> FindVen[/Buscar Vendedor/]:::data
+    FindVen --> FoundVen{¿Existe?}:::decision
+    FoundVen -- No --> Menu
+    FoundVen -- Sí --> Loop{AGREGAR ITEMS}:::decision
 
+    Loop --> FindProd[/Buscar Producto/]:::data
+    FindProd --> FoundPro{¿Existe?}:::decision
+    FoundPro -- No --> FindProd
+    FoundPro -- Si --> FoundCanti[/Ingresar Cantidad/]:::data
+    FoundCanti --> Stock{¿Hay Stock?}:::decision
+    Stock -- No --> Loop
+    Stock -- Sí --> Add[Agregar a Cola]:::proceso
+    Add --> More{¿Otro producto?}:::decision
+    More -- Sí --> Loop
+    More -- No --> GenBol[Generar Boleta]:::proceso
+    GenBol --> FinVenta
 
-        Menu -- "6. Eliminar Vendedor" --> StartEliVen[Iniciar proceso]:::proceso
-        StartEliVen --> FindEliVen[/Buscar Nombre o DNI/]:::data
-        FindEliVen --> FoundEliVen{¿Existe?}:::decision
-        FoundEliVen -- No --> Menu
-        FoundEliVen -- Si --> FoundEliVenMsg[/Vendedor eliminado/]:::data
+    %% 2. CREAR CLIENTE
+    Menu -- "2. Crear Cliente" --> FindCl[/Ingresar datos Cliente/]:::data
+    FindCl --> CreaCli[Cliente creado]:::proceso
+    CreaCli --> SaveCli[/Guardar en Datos_Clientes.csv/]:::data
 
+    %% 3. CREAR VENDEDOR
+    Menu -- "3. Crear Vendedor" --> FindVe[/Ingresar datos Vendedor/]:::data
+    FindVe --> CreaVend[Vendedor creado]:::proceso
+    CreaVend --> SaveVen[/Guardar en Datos_Vendedores.csv/]:::data
 
+    %% 4. CREAR PRODUCTO
+    Menu -- "4. Crear Producto" --> FindCod[/Generar código automático/]:::data
+    FindCod --> FindPr[/Ingresar datos Producto/]:::data
+    FindPr --> CreaPro[Producto creado]:::proceso
+    CreaPro --> SavePro[/Guardar en Datos_Productos.csv/]:::data
 
-        Menu -- "7. Eliminar Producto" --> StartEliProd[Iniciar proceso]:::proceso
-        StartEliProd --> FindEliProd[/Buscar ID o Nombre/]:::data
-        FindEliProd --> FoundEliProd{¿Existe?}:::decision
-        FoundEliProd -- No --> Menu
-        FoundEliProd -- Si --> FoundEliProdMsg[/Producto eliminado/]:::data
+    %% 5. ELIMINAR CLIENTE
+    Menu -- "5. Eliminar Cliente" --> FindEliCli[/Buscar Cliente/]:::data
+    FindEliCli --> FoundEliCli{¿Existe?}:::decision
+    FoundEliCli -- No --> Menu
+    FoundEliCli -- Si --> FoundEliCl[/Cliente eliminado/]:::data
 
+    %% 6. ELIMINAR VENDEDOR
+    Menu -- "6. Eliminar Vendedor" --> FindEliVen[/Buscar Vendedor/]:::data
+    FindEliVen --> FoundEliVen{¿Existe?}:::decision
+    FoundEliVen -- No --> Menu
+    FoundEliVen -- Si --> FoundEliVenMsg[/Vendedor eliminado/]:::data
 
+    %% 7. ELIMINAR PRODUCTO
+    Menu -- "7. Eliminar Producto" --> FindEliProd[/Buscar Producto/]:::data
+    FindEliProd --> FoundEliProd{¿Existe?}:::decision
+    FoundEliProd -- No --> Menu
+    FoundEliProd -- Si --> FoundEliProdMsg[/Producto eliminado/]:::data
 
-        Menu -- "8. Mostrar Clientes" --> StartMosCli[Iniciar proceso]:::proceso
-        StartMosCli --> FindMosCli[/Buscar en: Datos_Clientes.csv/]:::data
-        FindMosCli --> FoundMoC[/Mostrar datos de clientes/]:::data 
+    %% 8. MOSTRAR CLIENTES
+    Menu -- "8. Mostrar Clientes" --> FindMosCli[/Leer Datos_Clientes.csv/]:::data --> FoundMosCli[/Mostrar Clientes/]:::data
 
+    %% 9. MOSTRAR VENDEDORES
+    Menu -- "9. Mostrar Vendedores" --> FindMosVen[/Leer Datos_Vendedores.csv/]:::data --> FoundMosVen[/Mostrar Vendedores/]:::data
 
-        Menu -- "9. Mostrar Vendedores" --> StartMosVen[Iniciar proceso]:::proceso
-        StartMosVen --> FindMosVen[/Buscar en: Datos_Vendedores.csv/]:::data
-        FindMosVen --> FoundMosVen[/Mostrar datos de vendedores/]:::data
+    %% 10. MOSTRAR PRODUCTOS
+    Menu -- "10. Mostrar Productos" --> FindMosProd[/Leer Datos_Productos.csv/]:::data --> FoundMosProd[/Mostrar Productos/]:::data
 
-        
-        Menu -- "10. Mostrar Productos" --> StartMosProd[Iniciar proceso]:::proceso
-        StartMosProd --> FindMosProd[/Buscar en: Datos_Productos.csv/]:::data
-        FindMosProd --> FoundMosProd[/Mostrar datos de productos/]:::data
+    %% 11. INGRESAR NUEVO STOCK
+    Menu -- "11. Ingresar nuevo stock" --> FindStock[/Buscar Producto/]:::data
+    FindStock --> FoundStock{¿Existe?}:::decision
+    FoundStock -- No --> Menu
+    FoundStock -- Si --> FoundInCa[/Ingrese Cantidad/]:::data
+    FoundInCa --> FoundInPre[/Ingrese nuevo precio/]:::data
+    FoundInPre --> FoundReg[/Stock registrado/]:::data
 
-        Menu -- "11. Ingresar nuevo stock" --> StartStock[Iniciar proceso]:::proceso
-        StartStock --> FindStock[/Buscar producto por Nombre o ID/]:::data
-        FindStock --> FoundStock{¿Existe?}:::decision
-        FoundStock -- No --> Menu
-        FoundStock -- Si --> FoundInCa[/Ingrese Cantidad/]:::data
-        FoundInCa --> FoundInPre[/Ingrese nuevo precio de compra/]:::data
-        FoundInPre --> FoundReg[/Stock registrado/]:::data
-        
-        Menu -- "12. Cerrar sesión" --> Login
+    %% 12. CERRAR SESIÓN
+    Menu -- "12. Cerrar sesión" --> Login
+
 
         
     </div>
