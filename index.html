@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flujograma Vertical Tienda Limpieza</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e0e5ec;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+            margin: 0;
+        }
+        .canvas-paper {
+            background-color: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        h1 {
+            color: #003366;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        p { color: #666; margin-bottom: 40px; }
+        .mermaid { display: flex; justify-content: center; }
+    </style>
+</head>
+<body>
+
+<div class="canvas-paper">
+
+
+    <div class="mermaid">
+    %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'edgeLabelBackground':'#ffffff', 'tertiaryColor': '#f4f4f4', 'fontFamily': 'Roboto', 'lineColor': '#003366', 'primaryBorderColor': '#003366', 'primaryTextColor': '#003366'}}}%%
+    graph TD
+        %% Estilos similares a Canva
+        classDef inicio fill:#003366,stroke:#003366,stroke-width:2px,color:white,rx:5,ry:5;
+        classDef proceso fill:#ffffff,stroke:#003366,stroke-width:1px,color:#003366,rx:0,ry:0;
+        classDef decision fill:#e6f2ff,stroke:#003366,stroke-width:2px,color:#003366,rx:5,ry:5;
+        classDef data fill:#f9f9f9,stroke:#003366,stroke-width:1px,stroke-dasharray: 5 5,color:#003366;
+
+        INICIO--> Init[Inicializar Sistema]:::proceso
+        Init --> Load[/Cargar CSV: Clientes, Vendedores, Productos/]:::data
+        
+        Load --> Login{LOGIN}:::decision
+        Login --> Creds[/Ingresar Eduardo / 5734/ o Ingresar Nelver / 0911/]:::proceso
+
+        Creds --> Check{¿Es válido?}:::decision
+        
+        Check -- No --> Login
+        Check -- Sí --> Menu{MENÚ PRINCIPAL}:::decision
+
+        %% RAMA VENTAS
+        Menu -- "1. Venta" --> StartVenta[Iniciar Venta]:::proceso
+        StartVenta --> FindCli[/Buscar Cliente/]:::data
+        FindCli --> FoundCli{¿Existe?}:::decision
+        FoundCli -- No --> Menu
+        FoundCli -- Sí --> FindVen[/Buscar Vendedor/]:::data
+        FindVen --> FoundVen{¿Existe?}:::decision
+        FoundVen -- No --> Menu
+        FoundVen -- Sí --> Cart[Crear Carrito]:::proceso
+        
+        Cart --> Loop{AGREGAR ITEMS}:::decision
+        Loop --> FindProd[/Buscar Producto/]:::data
+        FindProd --> FoundPro{¿Existe?}:::decision
+        FoundPro -- No --> FindProd
+        FoundPro -- Si --> FoundCanti[/Ingresar Cantidad/]:::data 
+        FoundCanti -->  Stock{¿Hay Stock?}:::decision
+        Stock -- No --> Loop
+        Stock -- Sí --> Add[Agregar a Cola]:::proceso
+        Add --> More{¿Otro?}:::decision
+        More -- Sí --> Loop
+        More -- No --> DescStock[Descontar Stock]:::proceso
+        DescStock --> GenBol[Generar Boleta]:::proceso
+        GenBol --> SaveBol[/Confirmar la venta/]:::data
+        SaveBol --> FinVenta
+
+
+        Menu -- "2. Crear Cliente" --> StartCliente[Iniciar proceso]:::proceso
+        StartCliente --> FindCl[/Ingresar datos: Nombre completo, DNI, Dirección/]:::data
+        FindCl --> CreaCli[Cliente creado]:::proceso
+        CreaCli --> SaveCli[/Guardado en Datos_Clientes.csv/]:::data
+
+        
+        Menu -- "3. Crear Vendedor" --> StartVendedor[Iniciar proceso]:::proceso
+        StartVendedor --> FindVe[/Ingresar datos: Nombre completo y codigo para ventas/]:::data
+        FindVe --> CreaVend[Vendedor creado]:::proceso
+        CreaVend --> SaveVen[/Guardado en Datos_Vendedores.csv/]:::data
+
+
+        Menu -- "4. Crear Producto" --> StartProducto[Iniciar proceso]:::proceso
+        StartProducto --> FindCod[/Generacion de codigo automatica/]
+        FindCod --> FindPr[/Ingresar datos: Nombre del producto, Unidad, Precio de compra y stock inicial/]:::data
+        FindPr --> CreaPro[Producto creado]:::proceso
+        CreaPro --> SavePro[/Guardado en Datos_Productos.csv/]:::data
+
+
+        Menu -- "5. Eliminar Cliente" --> StartEliCli[Iniciar proceso]:::proceso
+        StartEliCli --> FindEliCli[/Buscar Nombre o DNI/]:::data
+        FindEliCli --> FoundEliCli{¿Existe?}:::decision
+        FoundEliCli -- No --> Menu
+        FoundEliCli -- Si --> FoundEliCl[/Cliente eliminado/]:::data 
+
+
+        Menu -- "6. Eliminar Vendedor" --> StartEliVen[Iniciar proceso]:::proceso
+        StartEliVen --> FindEliVen[/Buscar Nombre o DNI/]:::data
+        FindEliVen --> FoundEliVen{¿Existe?}:::decision
+        FoundEliVen -- No --> Menu
+        FoundEliVen -- Si --> FoundEliVenMsg[/Vendedor eliminado/]:::data
+
+
+
+        Menu -- "7. Eliminar Producto" --> StartEliProd[Iniciar proceso]:::proceso
+        StartEliProd --> FindEliProd[/Buscar ID o Nombre/]:::data
+        FindEliProd --> FoundEliProd{¿Existe?}:::decision
+        FoundEliProd -- No --> Menu
+        FoundEliProd -- Si --> FoundEliProdMsg[/Producto eliminado/]:::data
+
+
+
+        Menu -- "8. Mostrar Clientes" --> StartMosCli[Iniciar proceso]:::proceso
+        StartMosCli --> FindMosCli[/Buscar en: Datos_Clientes.csv/]:::data
+        FindMosCli --> FoundMoC[/Mostrar datos de clientes/]:::data 
+
+
+        Menu -- "9. Mostrar Vendedores" --> StartMosVen[Iniciar proceso]:::proceso
+        StartMosVen --> FindMosVen[/Buscar en: Datos_Vendedores.csv/]:::data
+        FindMosVen --> FoundMosVen[/Mostrar datos de vendedores/]:::data
+
+        
+        Menu -- "10. Mostrar Productos" --> StartMosProd[Iniciar proceso]:::proceso
+        StartMosProd --> FindMosProd[/Buscar en: Datos_Productos.csv/]:::data
+        FindMosProd --> FoundMosProd[/Mostrar datos de productos/]:::data
+
+        Menu -- "11. Ingresar nuevo stock" --> StartStock[Iniciar proceso]:::proceso
+        StartStock --> FindStock[/Buscar producto por Nombre o ID/]:::data
+        FindStock --> FoundStock{¿Existe?}:::decision
+        FoundStock -- No --> Menu
+        FoundStock -- Si --> FoundInCa[/Ingrese Cantidad/]:::data
+        FoundInCa --> FoundInPre[/Ingrese nuevo precio de compra/]:::data
+        FoundInPre --> FoundReg[/Stock registrado/]:::data
+        
+        Menu -- "12. Cerrar sesión" --> Login
+
+        
+    </div>
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: true });
+</script>
+
+</body>
+</html>
